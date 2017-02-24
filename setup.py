@@ -64,11 +64,7 @@ def find_meta(meta):
 VERSION = find_meta("version")
 URI = find_meta("uri")
 LONG = (
-    read("README.rst") + "\n\n" +
-    "Release Information\n" +
-    "===================\n\n" +
-    re.search("(\d+.\d.\d \(.*?\)\n.*?)\n\n\n----\n\n\n",
-              read("CHANGELOG.rst"), re.S).group(1)
+    read("README.rst")
 )
 
 
