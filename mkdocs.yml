@@ -1,0 +1,4 @@
+site_name: drf-timeordered-pagination
+site_description: Pagination class for Django REST Framework to paginate by mutable time attribute
+repo_url: https://github.com/andrewdodd/drf-timeorders-pagination
+site_dir: html
