@@ -1,7 +1,6 @@
 import pytest
 from mock import MagicMock, Mock, patch, sentinel, ANY
 
-from django.test import TestCase
 from django.utils import timezone
 
 from timeordered_pagination.pagination import TimeOrderedPagination
@@ -15,7 +14,7 @@ from tests.models import TestModel
 factory = APIRequestFactory()
 
 
-class TestPagination(TestCase):
+class TestPagination:
     def test_it_has_sensible_defaults(self):
         sut = TimeOrderedPagination(None, None, None, None, None)
         assert sut.default_limit == api_settings.PAGE_SIZE
@@ -34,8 +33,8 @@ class TestPagination(TestCase):
 
 
 @pytest.mark.django_db
-class TestPaginationMethods(TestCase):
-    def setUp(self):
+class TestPaginationMethods:
+    def setup(self):
         self.models = [
             TestModel.objects.create(n=1),
             TestModel.objects.create(n=2),
