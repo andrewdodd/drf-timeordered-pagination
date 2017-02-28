@@ -2,7 +2,7 @@ from django.db import models
 from model_utils.models import TimeStampedModel
 
 
-class TestModel(TimeStampedModel):
+class ModelWithModified(TimeStampedModel):
     n = models.IntegerField("An integer")
 
     class Meta:
