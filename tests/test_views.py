@@ -8,8 +8,8 @@ from timeordered_pagination.pagination import TimeOrderedPagination
 from rest_framework.settings import api_settings
 from rest_framework.test import APIRequestFactory
 
-from tests.models import ModelWithModified
-from tests.views import ViewSetWithModified
+from tests.models import (ModelWithModified, ModelWithAnotherField)
+from tests.views import (ViewSetWithModified, ViewSetWithAnotherField)
 
 
 factory = APIRequestFactory()
@@ -257,4 +257,54 @@ class TestQuerysetLogic:
             self.middle_secondPK]
 
 
+@pytest.mark.django_db
+class TestWithAnotherField:
+    def setup(self):
+        self.start_of_test = timezone.now()
+        self.view = ViewSetWithAnotherField.as_view({'get': 'list'})
 
+        # default ordering is by 'n' field
+        self.first = ModelWithAnotherField.objects.create(n=2)
+        self.middle_of_test = timezone.now()
+        self.middle_firstPK = ModelWithAnotherField.objects.create(n=4)
+        self.middle_secondPK = ModelWithAnotherField.objects.create(n=1,
+                                                        another_field=self.middle_firstPK.another_field)
+        self.last = ModelWithAnotherField.objects.create(n=3)
+
+    def test_normal_queryset_obeys_default_ordering(self):
+        request = factory.get('/data-with-another-field/')
+        response = self.view(request)
+        # default ordering is by 'n' field
+        assert response.data['results'] == [
+            self.middle_secondPK,
+            self.first,
+            self.last,
+            self.middle_firstPK]
+
+    def test_from_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(self):
+        request = factory.get('/data-with-another-field/',
+                {'another_field_from': self.middle_of_test})
+        response = self.view(request)
+        assert response.data['results'] == [
+            self.middle_firstPK,
+            self.middle_secondPK,
+            self.last]
+
+    def test_after_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(self):
+        request = factory.get('/data-with-another-field/',
+                {'another_field_after': self.middle_of_test})
+        response = self.view(request)
+        assert response.data['results'] == [
+            self.middle_firstPK,
+            self.middle_secondPK,
+            self.last]
+
+    def test_it_returns_from_specified_time_and_immutable_db_field(self):
+        request = factory.get('/data-with-another-field/', {
+            'another_field_from': self.middle_firstPK.another_field.isoformat(),
+            'start_from_id': self.middle_secondPK.id,
+        })
+        response = self.view(request)
+        assert response.data['results'] == [
+            self.middle_secondPK,
+            self.last]

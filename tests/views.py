@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from timeordered_pagination.views import TimeOrderedPaginationViewSetMixin
 
-from tests.models import ModelWithModified
+from tests.models import ModelWithModified, ModelWithAnotherField
 
 
 class PassThroughSerializer(serializers.BaseSerializer):
@@ -16,3 +16,8 @@ class ViewSetWithModified(TimeOrderedPaginationViewSetMixin, ReadOnlyModelViewSe
     ordering = 'id'
 
 
+class ViewSetWithAnotherField(TimeOrderedPaginationViewSetMixin, ReadOnlyModelViewSet):
+    queryset = ModelWithAnotherField.objects.all()
+    serializer_class = PassThroughSerializer
+    ordering = 'id'
+    target_field = 'another_field'
