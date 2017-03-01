@@ -1,5 +1,5 @@
 import pytest
-from mock import MagicMock, Mock, patch, sentinel, ANY
+from mock import Mock, sentinel, ANY
 
 from django.utils import timezone
 
@@ -26,11 +26,13 @@ class TestPagination:
     def test_it_can_have_the_max_limit_overridden(self):
         LIMIT = sentinel
         assert TimeOrderedPagination(None, None, None,
-                                     None, None, max_limit_override=LIMIT).max_limit == LIMIT
+                                     None, None, max_limit_override=LIMIT
+                                     ).max_limit == LIMIT
 
     def test_it_can_have_the_limit_query_param_value_overridden(self):
         assert TimeOrderedPagination(None, None, None,
-                                     None, None, limit_query_param_override='a_query_param'
+                                     None, None,
+                                     limit_query_param_override='a_query_param'
                                      ).limit_query_param == 'a_query_param'
 
 
@@ -189,8 +191,10 @@ class TestQuerysetLogic:
         # default ordering is by 'n' field
         self.first = ModelWithModified.objects.create(n=2)
         self.middle_firstPK = ModelWithModified.objects.create(n=4)
-        self.middle_secondPK = ModelWithModified.objects.create(n=1,
-                                                                modified=self.middle_firstPK.modified)
+        self.middle_secondPK = ModelWithModified.objects.create(
+            n=1,
+            modified=self.middle_firstPK.modified
+        )
         self.last = ModelWithModified.objects.create(n=3)
 
     def test_normal_queryset_obeys_default_ordering(self):
@@ -203,7 +207,7 @@ class TestQuerysetLogic:
             self.last,
             self.middle_firstPK]
 
-    def test_from_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+    def test_it_returns_in_custom_order_by_for_from_query_param(
             self):
         request = factory.get('/data/', {'modified_from': self.start_of_test})
         response = self.view(request)
@@ -213,7 +217,7 @@ class TestQuerysetLogic:
             self.middle_secondPK,
             self.last]
 
-    def test_after_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+    def test_it_returns_in_custom_order_by_for_after_query_param(
             self):
         request = factory.get('/data/', {'modified_after': self.start_of_test})
         response = self.view(request)
@@ -284,8 +288,9 @@ class TestWithAnotherField:
         self.first = ModelWithAnotherField.objects.create(n=2)
         self.middle_of_test = timezone.now()
         self.middle_firstPK = ModelWithAnotherField.objects.create(n=4)
-        self.middle_secondPK = ModelWithAnotherField.objects.create(n=1,
-                                                                    another_field=self.middle_firstPK.another_field)
+        self.middle_secondPK = ModelWithAnotherField.objects.create(
+            n=1, another_field=self.middle_firstPK.another_field
+        )
         self.last = ModelWithAnotherField.objects.create(n=3)
 
     def test_normal_queryset_obeys_default_ordering(self):
@@ -298,7 +303,7 @@ class TestWithAnotherField:
             self.last,
             self.middle_firstPK]
 
-    def test_from_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+    def test_it_returns_in_custom_order_by_for_from_query_param(
             self):
         request = factory.get('/data-with-another-field/',
                               {'another_field_from': self.middle_of_test})
@@ -308,7 +313,7 @@ class TestWithAnotherField:
             self.middle_secondPK,
             self.last]
 
-    def test_after_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+    def test_it_returns_in_custom_order_by_for_after_query_param(
             self):
         request = factory.get('/data-with-another-field/',
                               {'another_field_after': self.middle_of_test})
@@ -320,7 +325,8 @@ class TestWithAnotherField:
 
     def test_it_returns_from_specified_time_and_immutable_db_field(self):
         request = factory.get('/data-with-another-field/', {
-            'another_field_from': self.middle_firstPK.another_field.isoformat(),
+            'another_field_from':
+                self.middle_firstPK.another_field.isoformat(),
             'start_from_id': self.middle_secondPK.id,
         })
         response = self.view(request)

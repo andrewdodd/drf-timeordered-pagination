@@ -1,13 +1,10 @@
-import pytest
 from mock import Mock, patch, sentinel
 
 from django.test import TestCase
-from django.utils import timezone
 
 from timeordered_pagination.views import TimeOrderedPaginationViewSetMixin
 
 from rest_framework.test import APIRequestFactory
-from rest_framework.settings import api_settings
 
 
 factory = APIRequestFactory()
@@ -68,28 +65,31 @@ class ViewSet(TimeOrderedPaginationViewSetMixin, SuperViewSet):
 
 class ItReturnsCustomPaginatorTests(TestCase):
 
-    def test_it_returns_normal_paginator_if_request_not_for_timeordered_pagination(
+    def test_it_returns_normal_paginator_if_not_for_timeordered_pagination(
             self):
         sut = ViewSet()
-        with patch.object(sut, 'is_timeordered_pagination_request') as is_time_ordered:
+        with patch.object(sut, 'is_timeordered_pagination_request') as\
+                is_time_ordered:
             is_time_ordered.return_value = False
             assert sut.paginator == sentinel.super_paginator
             is_time_ordered.assert_called_once()
 
     @patch('timeordered_pagination.views.TimeOrderedPagination')
-    def test_it_returns_custom_paginator_if_request_is_for_timeordered_pagination(
+    def test_it_returns_custom_paginator_for_timeordered_pagination(
             self, CustomPagination):
         sut = TimeOrderedPaginationViewSetMixin()
-        with patch.object(sut, 'is_timeordered_pagination_request') as is_time_ordered:
+        with patch.object(sut, 'is_timeordered_pagination_request') as\
+                is_time_ordered:
             is_time_ordered.return_value = True
             assert sut.paginator == CustomPagination.return_value
             is_time_ordered.assert_called_once()
 
     @patch('timeordered_pagination.views.TimeOrderedPagination')
-    def test_it_returns_the_same_object_for_custom_pagination_for_multiple_calls(
+    def test_it_returns_the_same_paginator_for_multiple_calls(
             self, CustomPagination):
         sut = TimeOrderedPaginationViewSetMixin()
-        with patch.object(sut, 'is_timeordered_pagination_request') as is_time_ordered:
+        with patch.object(sut, 'is_timeordered_pagination_request') as\
+                is_time_ordered:
             is_time_ordered.return_value = True
             assert sut.paginator == CustomPagination.return_value
             assert sut.paginator == CustomPagination.return_value
@@ -103,7 +103,8 @@ class ItReturnsCustomPaginatorTests(TestCase):
         sut.limit_query_param_override = 'custom_limit_param'
         sut.max_limit_override = 'custom_max_limit_param'
 
-        with patch.object(sut, 'is_timeordered_pagination_request') as is_time_ordered:
+        with patch.object(sut, 'is_timeordered_pagination_request') as\
+                is_time_ordered:
             is_time_ordered.return_value = True
             assert sut.paginator == CustomPagination.return_value
             CustomPagination.assert_called_once_with(
