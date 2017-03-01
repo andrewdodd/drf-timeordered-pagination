@@ -15,6 +15,13 @@ Requirements
 -  Django (1.8+)
 -  Django REST Framework (3.1+)
 
+Important notes
+---------------
+
+The layout of the docs and the Git project were borrowed from:
+- drf-proxy-pagination
+- django-nsync (which was borrowed from other people too!)
+
 Installation
 ------------
 
