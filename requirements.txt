@@ -7,9 +7,9 @@ pytest-django
 pytest
 pytest-cov
 flake8
-django-model-utils
 mock
 django-model-utils
+pytest-flake8
 
 # wheel for PyPI installs
 #wheel==0.24.0
