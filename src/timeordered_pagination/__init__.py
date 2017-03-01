@@ -1,4 +1,4 @@
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 __title__ = 'drf_timeordered_pagination'
 __description__ = 'Utility classes to provide time-ordered pagination over '\
