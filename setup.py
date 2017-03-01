@@ -20,7 +20,6 @@ CLASSIFIERS = [
     'Framework :: Django',
     'Framework :: Django :: 1.8',
     'Framework :: Django :: 1.9',
-    'Framework :: Django :: 1.10',
     'Intended Audience :: Developers',
     "Programming Language :: Python",
     "Programming Language :: Python :: 2",
