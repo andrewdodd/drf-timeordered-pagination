@@ -52,9 +52,9 @@ In `views.py`, hook up your own integration into the pagination, or use one of t
         ...
 
 
-    from 
+    from timeordered_pagination.views import TimeOrderedPaginationViewSetMixin
     class ExampleClassView(
-        ModifiedFilterApiViewSetMixin,
+        TimeOrderedPaginationViewSetMixin,
         ...,
         viewsets.ModelViewSet)
         ...
@@ -62,9 +62,9 @@ In `views.py`, hook up your own integration into the pagination, or use one of t
 
 ## Example
 
-http://api.example.org/examples/ gives default pagination.
-http://api.example.org/examples/?modified_after=1900-01-01T00:00:00Z gives all examples, modified after (greater than) Midnight, 1 Jan 1900, in modified order
-http://api.example.org/examples/?modified_from=1900-01-01T00:00:00Z gives all examples, modified from (greater than or equal to) Midnight, 1 Jan 1900, in modified order
+ - [http://api.example.org/examples/](http://api.example.org/examples/) gives default pagination.
+ - [http://api.example.org/examples/?modified_after=1900-01-01T00:00:00Z](http://api.example.org/examples/?modified_after=1900-01-01T00:00:00Z) gives all examples, modified after (greater than) Midnight, 1 Jan 1900, in modified order
+ - [http://api.example.org/examples/?modified_from=1900-01-01T00:00:00Z](http://api.example.org/examples/?modified_from=1900-01-01T00:00:00Z) gives all examples, modified from (greater than or equal to) Midnight, 1 Jan 1900, in modified order
 
 
 ## Testing
@@ -75,10 +75,10 @@ Install testing requirements.
 $ pip install -r requirements.txt
 ```
 
-Run with runtests.
+Run with pytest.
 
 ```bash
-$ ./runtests.py
+$ py.test
 ```
 
 You can also use the excellent [tox](http://tox.readthedocs.org/en/latest/) testing tool to run the tests against all supported versions of Python and Django. Install tox globally, and then simply run:
