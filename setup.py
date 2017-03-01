@@ -12,23 +12,28 @@ PACKAGES = find_packages(where="src")
 META_PATH = os.path.join("src", "timeordered_pagination", "__init__.py")
 KEYWORDS = ["Django Rest Framework", "Django", "Pagination"]
 CLASSIFIERS = [
-    "Private :: Do Not Upload", # Prevent from ever loading to PyPI (thanks
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     'Framework :: Django',
+    'Framework :: Django :: 1.8',
     'Framework :: Django :: 1.9',
+    'Framework :: Django :: 1.10',
     'Intended Audience :: Developers',
     "Programming Language :: Python",
+    "Programming Language :: Python :: 2",
+    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 INSTALL_REQUIRES = [
-    'django>=1.9',
+    'django>=1.8',
+    'djangorestframework>=3.1',
 ]
 
 ###############################################################################
