@@ -22,8 +22,9 @@ class TimeOrderedPaginationViewSetMixin(object):
             single page. NB: This will be capped at the class's configured
             'max_limit' value.
      - 'start_from_<TARGET FIELD>' -> which will be used in conjunction with
-            'modified_from' to choose which 'field' at which should be the first
-            item in the page. This is necessary to allow robust pagination.
+            'modified_from' to choose which 'field' at which should be the
+            first item in the page. This is necessary to allow robust
+            pagination.
     """
     after_query_param_template = '{}_after'
     from_query_param_template = '{}_from'
@@ -47,26 +48,33 @@ class TimeOrderedPaginationViewSetMixin(object):
         return self.from_query_param_template.format(self.target_field)
 
     def get_queryset(self):
-        queryset = super(TimeOrderedPaginationViewSetMixin, self).get_queryset()
+        queryset = super(TimeOrderedPaginationViewSetMixin,
+                         self).get_queryset()
 
         if not self.is_timeordered_pagination_request():
             # Nothing for us to do
             return queryset
 
         query_params = self.request.query_params
-        modified_after = query_params.get(self.modified_after_query_param, None)
+        modified_after = query_params.get(
+            self.modified_after_query_param, None)
         modified_from = query_params.get(self.modified_from_query_param, None)
 
         if modified_after is not None:
-            queryset = queryset.filter(**{self.target_field + '__gt': modified_after})
+            queryset = queryset.filter(**{
+                self.target_field + '__gt': modified_after
+            })
         elif modified_from is not None:
             start_at = query_params.get(self.start_from_query_param, None)
             if start_at is None:
-                queryset = queryset.filter(**{self.target_field + '__gte': modified_from})
+                queryset = queryset.filter(**{
+                    self.target_field + '__gte': modified_from
+                })
             else:
-                # modified > modified_from || modified == modified_from and id >= start_at
+                # modified > modified_from || modified == modified_from and id
+                # >= start_at
                 query = Q(**{self.target_field + '__gt': modified_from}) |\
-                        (Q(**{self.target_field: modified_from}) &
+                    (Q(**{self.target_field: modified_from}) &
                      Q(**{self.start_from_target_field + '__gte': start_at}))
                 queryset = queryset.filter(query)
         else:
@@ -74,7 +82,8 @@ class TimeOrderedPaginationViewSetMixin(object):
 
         # Ensure order by modified then 'id', as this is how we maintain a
         # consistent ordering between calls
-        queryset = queryset.order_by(self.target_field, self.start_from_target_field)
+        queryset = queryset.order_by(
+            self.target_field, self.start_from_target_field)
 
         return queryset
 

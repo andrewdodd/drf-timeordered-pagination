@@ -14,13 +14,16 @@ factory = APIRequestFactory()
 
 
 class IsTimeOrderedPaginationRequestTests(TestCase):
-    def test_request_is_for_timeordered_pagination_if_it_has_the_after_param(self):
+
+    def test_request_is_for_timeordered_pagination_if_it_has_the_after_param(
+            self):
         sut = TimeOrderedPaginationViewSetMixin()
         sut.request = Mock()
         sut.request.query_params = {'modified_after': 'anything'}
         assert sut.is_timeordered_pagination_request()
 
-    def test_request_is_for_timeordered_pagination_if_it_has_the_from_param(self):
+    def test_request_is_for_timeordered_pagination_if_it_has_the_from_param(
+            self):
         sut = TimeOrderedPaginationViewSetMixin()
         sut.request = Mock()
         sut.request.query_params = {'modified_from': 'anything'}
@@ -64,7 +67,9 @@ class ViewSet(TimeOrderedPaginationViewSetMixin, SuperViewSet):
 
 
 class ItReturnsCustomPaginatorTests(TestCase):
-    def test_it_returns_normal_paginator_if_request_not_for_timeordered_pagination(self):
+
+    def test_it_returns_normal_paginator_if_request_not_for_timeordered_pagination(
+            self):
         sut = ViewSet()
         with patch.object(sut, 'is_timeordered_pagination_request') as is_time_ordered:
             is_time_ordered.return_value = False
@@ -109,4 +114,3 @@ class ItReturnsCustomPaginatorTests(TestCase):
                 'start_from_custom_db_id_field',
                 sut.limit_query_param_override,
                 sut.max_limit_override)
-

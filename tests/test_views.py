@@ -16,25 +16,27 @@ factory = APIRequestFactory()
 
 
 class TestPagination:
+
     def test_it_has_sensible_defaults(self):
         sut = TimeOrderedPagination(None, None, None, None, None)
         assert sut.default_limit == api_settings.PAGE_SIZE
-        assert sut.max_limit == None
+        assert sut.max_limit is None
         assert sut.limit_query_param == 'limit'
 
     def test_it_can_have_the_max_limit_overridden(self):
         LIMIT = sentinel
         assert TimeOrderedPagination(None, None, None,
-            None, None, max_limit_override=LIMIT).max_limit == LIMIT
+                                     None, None, max_limit_override=LIMIT).max_limit == LIMIT
 
     def test_it_can_have_the_limit_query_param_value_overridden(self):
         assert TimeOrderedPagination(None, None, None,
-            None, None, limit_query_param_override='a_query_param'
-        ).limit_query_param == 'a_query_param'
+                                     None, None, limit_query_param_override='a_query_param'
+                                     ).limit_query_param == 'a_query_param'
 
 
 @pytest.mark.django_db
 class TestPaginationMethods:
+
     def setup(self):
         self.models = [
             ModelWithModified.objects.create(n=1),
@@ -53,16 +55,20 @@ class TestPaginationMethods:
             'start_from id')
 
         class QuerySetMock:
+
             def __init__(self, values):
                 self.values = values
+
             def __iter__(self):
                 return iter(self.values)
+
             def __getitem__(self, name):
                 return self.values[name]
+
             def count(self):
                 return len(self.values)
 
-        self.mock_queryset = QuerySetMock([1,2,3,4])
+        self.mock_queryset = QuerySetMock([1, 2, 3, 4])
 
     def test_it_uses_default_limit(self):
         default_page_size = api_settings.PAGE_SIZE
@@ -76,15 +82,15 @@ class TestPaginationMethods:
         assert self.paginator.get_limit(request) == 123
 
     def test_it_clips_to_max_limit_if_configured(self):
-        paginator = TimeOrderedPagination(*[ANY] *5,
-            max_limit_override=123)
+        paginator = TimeOrderedPagination(*[ANY] * 5,
+                                          max_limit_override=123)
         request = Mock()
         request.query_params = {'limit': 999}
         assert paginator.get_limit(request) == 123
 
     def test_it_paginates_queryset(self):
-        paginator = TimeOrderedPagination(*[ANY] *5,
-            max_limit_override=3)
+        paginator = TimeOrderedPagination(*[ANY] * 5,
+                                          max_limit_override=3)
         request = Mock()
         request.query_params = {'limit': 999}
 
@@ -97,18 +103,19 @@ class TestPaginationMethods:
         assert paginator.limit == 3
 
     def test_get_next_link_returns_none_if_no_next_item(self):
-        paginator = TimeOrderedPagination(*[ANY] *5)
+        paginator = TimeOrderedPagination(*[ANY] * 5)
         next_item_qs = Mock()
         next_item_qs.exists.return_value = False
         paginator.next_item = next_item_qs
-        assert paginator.get_next_link() == None
+        assert paginator.get_next_link() is None
 
     def test_it_builds_the_next_link(self):
-        pass # ZOMG I'm sick of writing these horrible brittle tests
+        pass  # ZOMG I'm sick of writing these horrible brittle tests
 
 
 @pytest.mark.django_db
 class TestQueryset:
+
     def setup(self):
         self.models = [
             ModelWithModified.objects.create(n=1),
@@ -125,13 +132,16 @@ class TestQueryset:
         default_page_size = api_settings.PAGE_SIZE
         request = factory.get('/data/')
         response = self.view(request)
-        assert response.data['results'] == list(ModelWithModified.objects.all()[:default_page_size])
+        assert response.data['results'] == list(
+            ModelWithModified.objects.all()[:default_page_size])
 
     def test_it_uses_default_page_size_for_timeordered_query(self):
         default_page_size = api_settings.PAGE_SIZE
-        request = factory.get('/data/', {'modified_from': self.models[0].modified.isoformat()})
+        request = factory.get(
+            '/data/', {'modified_from': self.models[0].modified.isoformat()})
         response = self.view(request)
-        assert response.data['results'] == list(ModelWithModified.objects.all()[:default_page_size])
+        assert response.data['results'] == list(
+            ModelWithModified.objects.all()[:default_page_size])
 
     def test_it_allows_limit_to_be_set_in_query_param(self):
         request = factory.get('/data/', {
@@ -139,7 +149,8 @@ class TestQueryset:
             'limit': 2,
         })
         response = self.view(request)
-        assert response.data['results'] == list(ModelWithModified.objects.all()[:2])
+        assert response.data['results'] == list(
+            ModelWithModified.objects.all()[:2])
 
     def test_it_includes_matching_times_for_the_from_query_param(self):
         request = factory.get('/data/', {
@@ -157,7 +168,8 @@ class TestQueryset:
         response = self.view(request)
         assert response.data['results'] == []
 
-    def test_it_obeys_after_query_param_if_both_after_and_from_are_included(self):
+    def test_it_obeys_after_query_param_if_both_after_and_from_are_included(
+            self):
         request = factory.get('/data/', {
             'modified_after': self.models[-1].modified.isoformat(),
             'modified_from': self.models[-1].modified.isoformat(),
@@ -169,6 +181,7 @@ class TestQueryset:
 
 @pytest.mark.django_db
 class TestQuerysetLogic:
+
     def setup(self):
         self.start_of_test = timezone.now()
         self.view = ViewSetWithModified.as_view({'get': 'list'})
@@ -177,7 +190,7 @@ class TestQuerysetLogic:
         self.first = ModelWithModified.objects.create(n=2)
         self.middle_firstPK = ModelWithModified.objects.create(n=4)
         self.middle_secondPK = ModelWithModified.objects.create(n=1,
-                                                        modified=self.middle_firstPK.modified)
+                                                                modified=self.middle_firstPK.modified)
         self.last = ModelWithModified.objects.create(n=3)
 
     def test_normal_queryset_obeys_default_ordering(self):
@@ -190,7 +203,8 @@ class TestQuerysetLogic:
             self.last,
             self.middle_firstPK]
 
-    def test_from_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(self):
+    def test_from_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+            self):
         request = factory.get('/data/', {'modified_from': self.start_of_test})
         response = self.view(request)
         assert response.data['results'] == [
@@ -199,7 +213,8 @@ class TestQuerysetLogic:
             self.middle_secondPK,
             self.last]
 
-    def test_after_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(self):
+    def test_after_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+            self):
         request = factory.get('/data/', {'modified_after': self.start_of_test})
         response = self.view(request)
         assert response.data['results'] == [
@@ -228,7 +243,8 @@ class TestQuerysetLogic:
             self.middle_secondPK,
             self.last]
 
-    def test_it_returns_correct_results_if_elements_have_updated_before_call(self):
+    def test_it_returns_correct_results_if_elements_have_updated_before_call(
+            self):
         request = factory.get('/data/', {
             'modified_from': self.middle_firstPK.modified.isoformat(),
             'start_from_id': self.middle_firstPK.id,
@@ -259,6 +275,7 @@ class TestQuerysetLogic:
 
 @pytest.mark.django_db
 class TestWithAnotherField:
+
     def setup(self):
         self.start_of_test = timezone.now()
         self.view = ViewSetWithAnotherField.as_view({'get': 'list'})
@@ -268,7 +285,7 @@ class TestWithAnotherField:
         self.middle_of_test = timezone.now()
         self.middle_firstPK = ModelWithAnotherField.objects.create(n=4)
         self.middle_secondPK = ModelWithAnotherField.objects.create(n=1,
-                                                        another_field=self.middle_firstPK.another_field)
+                                                                    another_field=self.middle_firstPK.another_field)
         self.last = ModelWithAnotherField.objects.create(n=3)
 
     def test_normal_queryset_obeys_default_ordering(self):
@@ -281,18 +298,20 @@ class TestWithAnotherField:
             self.last,
             self.middle_firstPK]
 
-    def test_from_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(self):
+    def test_from_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+            self):
         request = factory.get('/data-with-another-field/',
-                {'another_field_from': self.middle_of_test})
+                              {'another_field_from': self.middle_of_test})
         response = self.view(request)
         assert response.data['results'] == [
             self.middle_firstPK,
             self.middle_secondPK,
             self.last]
 
-    def test_after_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(self):
+    def test_after_query_param_returns_ordered_by_timefield_and_then_immutable_db_field(
+            self):
         request = factory.get('/data-with-another-field/',
-                {'another_field_after': self.middle_of_test})
+                              {'another_field_after': self.middle_of_test})
         response = self.view(request)
         assert response.data['results'] == [
             self.middle_firstPK,

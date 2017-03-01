@@ -6,17 +6,20 @@ from tests.models import ModelWithModified, ModelWithAnotherField
 
 
 class PassThroughSerializer(serializers.BaseSerializer):
+
     def to_representation(self, item):
         return item
 
 
-class ViewSetWithModified(TimeOrderedPaginationViewSetMixin, ReadOnlyModelViewSet):
+class ViewSetWithModified(TimeOrderedPaginationViewSetMixin,
+                          ReadOnlyModelViewSet):
     queryset = ModelWithModified.objects.all()
     serializer_class = PassThroughSerializer
     ordering = 'id'
 
 
-class ViewSetWithAnotherField(TimeOrderedPaginationViewSetMixin, ReadOnlyModelViewSet):
+class ViewSetWithAnotherField(TimeOrderedPaginationViewSetMixin,
+                              ReadOnlyModelViewSet):
     queryset = ModelWithAnotherField.objects.all()
     serializer_class = PassThroughSerializer
     ordering = 'id'
