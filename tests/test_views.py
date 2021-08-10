@@ -1,5 +1,6 @@
 import pytest
 from mock import Mock, sentinel, patch
+from datetime import datetime
 
 from django.utils import timezone
 
@@ -293,13 +294,13 @@ class TestWithAnotherField:
         self.view = ViewSetWithAnotherField.as_view({'get': 'list'})
 
         # default ordering is by 'n' field
-        self.first = ModelWithAnotherField.objects.create(n=2)
-        self.middle_of_test = timezone.now()
-        self.middle_firstPK = ModelWithAnotherField.objects.create(n=4)
+        self.first = ModelWithAnotherField.objects.create(n=2, another_field=datetime(2000, 1, 1))
+        self.middle_of_test = datetime(2000, 1, 2)
+        self.middle_firstPK = ModelWithAnotherField.objects.create(n=4, another_field=datetime(2000, 1, 3))
         self.middle_secondPK = ModelWithAnotherField.objects.create(
             n=1, another_field=self.middle_firstPK.another_field
         )
-        self.last = ModelWithAnotherField.objects.create(n=3)
+        self.last = ModelWithAnotherField.objects.create(n=3, another_field=datetime(2000, 1, 4))
 
     def test_normal_queryset_obeys_default_ordering(self):
         request = factory.get('/data-with-another-field/')
